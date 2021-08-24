@@ -10,7 +10,7 @@ detector_type = 'dlib'
 distance_metric = 'euclidean'# 'euclidean_l2'
 
 identity = ""
-recognize = 1
+recognize = 0
 cap = cv2.VideoCapture(0)
 
 # font which we will be using to display FPS
@@ -23,17 +23,14 @@ prev_frame_time = 0
 new_frame_time = 0
 
 # Initialize the detector with the chosen model and resize value
-det = detector.FrameDetector(detector_type, 0.2)
+det = detector.FrameDetector(detector_type, 1)
 
 while True:
     # Read frame from cv2 source
     ret, img = cap.read()
 
-    # Convert to greyscale
-
-
     # Detect faces in frame
-    img, detections = det.detect(img)
+    det_img, detections = det.detect(img)
 
 
 
@@ -43,12 +40,12 @@ while True:
         # For every detection, identify face
         for idx, detection in enumerate(detections):
 
-            # Get face from frame
-            crop_img = img[detection[1]:detection[1] +
-                           detection[3], detection[0]:detection[0]+detection[2]]
+            # # Get face from frame
+            # crop_img = img[detection[1]:detection[1] +
+            #                detection[3], detection[0]:detection[0]+detection[2]]
 
-            # Write face to file
-            cv2.imwrite(str(idx) + '.jpg', crop_img)
+            # # Write face to file
+            cv2.imwrite(str(idx) + '.jpg', img)
 
             # Recognize the face
             recognition = DeepFace.find(
@@ -63,14 +60,13 @@ while True:
                 identity = recognition.iloc[0].identity
                 # identity = identity.split('/')[5]
                 cv2.putText(img, identity, (detection[0], detection[1]),
-                            cv2.FONT_HERSHEY_SIMPLEX, .5, (0, 255, 0), 2, cv2.LINE_AA)
+                            cv2.FONT_HERSHEY_SIMPLEX, .5, (255, 255, 255), 2, cv2.LINE_AA)
 
             else:
                 identity = "Unknown"
 
-
-           
-
+    elif len(detections) > 0:
+        cv2.putText(img, 'FACE FOUND', (7, 70), font, .5, (100, 255, 0), 1, cv2.LINE_AA)
     else:
         identity = ""
 
