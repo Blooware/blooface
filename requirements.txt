@@ -2,3 +2,4 @@ opencv-python
 dlib
 mtcnn
 DeepFace
+tensorflow-gpu
