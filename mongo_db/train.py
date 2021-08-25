@@ -3,7 +3,8 @@ connection = "mongodb://localhost:27017"
  
 client = MongoClient(connection)
  
-database = 'deepface'; collection = 'deepface'
+database = 'deepface'
+collection = 'deepface'
  
 db = client[database]
 
@@ -34,3 +35,10 @@ for i in tqdm(range(0, len(facial_img_paths))):
     instance.append(facial_img_path)
     instance.append(embedding)
     instances.append(instance)
+
+import pandas as pd
+df = pd.DataFrame(instances, columns = ["img_name", "embedding"])
+df.head()
+
+for index, instance in tqdm(df.iterrows(), total = df.shape[0]):
+    db[collection].insert_one({"img_path": instance["img_name"], "embedding" : instance["embedding"].tolist()})
