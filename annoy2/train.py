@@ -7,28 +7,28 @@ embedding_size = 128
 # Get every JPG image in the dataset and store it's path
 print("Loading images from dataset...")
 import os
-# files = []
-# for r, d, f in os.walk("dataset/"):
-#     for file in f:
-#         if ('.jpg' in file):
-#             exact_path = r + file
-#             files.append(exact_path)
-
-
 files = []
-raw_files = os.listdir("dataset/")
-for file in raw_files:
-    if file.endswith(".jpg"):
-        # remove all letters
-        file = re.sub("[^0-9]", "", file)
-        files.append(int(file.replace(".jpg", "")))
+for r, d, f in os.walk("dataset/"):
+    for file in f:
+        if ('.jpg' in file):
+            exact_path = r + file
+            files.append(exact_path)
 
-files = sorted(files)
-new_files = []
-for file in files:
-    new_files.append("dataset/" + str(file) + ".jpg")
 
-files = new_files
+# files = []
+# raw_files = os.listdir("dataset/")
+# for file in raw_files:
+#     if file.endswith(".jpg"):
+#         # remove all letters
+#         file = re.sub("[^0-9]", "", file)
+#         files.append(int(file.replace(".jpg", "")))
+
+# files = sorted(files)
+# new_files = []
+# for file in files:
+#     new_files.append("dataset/" + str(file) + ".jpg")
+
+# files = new_files
 
 
 from deepface.commons import functions
@@ -40,7 +40,7 @@ model = Facenet.loadModel()
 print("Generating embeddings...")
 representations = []
 for img_path in files:
-     
+    
     img = functions.preprocess_face(img=img_path, target_size=(160, 160))
     embedding = model.predict(img)[0,:]
      
@@ -49,7 +49,7 @@ for img_path in files:
     representation.append(embedding)
     representations.append(representation)
 
-
+print(representations)
 # Generate sythetic data
 print("Generating synthetic data...")
 import random
@@ -61,6 +61,11 @@ for i in range(70, 100000): #1M instances
     dummy_item.append(key)
     dummy_item.append(vector)
     representations.append(dummy_item)
+
+# save as datframe
+import pandas as pd
+df = pd.DataFrame(representations, columns = ["img_name", "embedding"])
+df.to_pickle("embeddings.pkl")
 
 # Spotify annoy
 print("Training annoy...")
@@ -75,7 +80,7 @@ for i in range(0, len(representations)):
     
    t.add_item(i, embedding)
  
-t.build(3) #3 trees
+t.build(10) #3 trees
 
 #save the built model
 t.save('result.ann')
