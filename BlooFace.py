@@ -81,3 +81,6 @@ class Blooface:
 
     def detect(self, img_path):
         return DeepFace.detectFace(img_path, detector_backend='mtcnn')
+
+    def verify(self, img_1, img_2):
+        return DeepFace.verify(img_1, img_2, distance_metric='euclidean', detector_backend='mtcnn')
