@@ -7,17 +7,17 @@ It's main objective is to provide a flexible and lightweight face recognition mo
 In the interest of AI and data safety, we have open sourced this module.
 
 To identify faces in a given frame (Numpy array representation):
-'''
+```
 faces, region = blooFace.query_image(frame)
-'''
+```
 
 To verify that two faces are the same:
-'''
+```
 blooFace.verify(img_path_1, img_path_2)
-'''
+```
 
 An example of a simple webcam feed implementation:
-'''
+```
 import cv2
 import BlooFace
 
@@ -55,7 +55,7 @@ while True:
     # Quit if q is pressed
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
-'''
+```
 -------------------------------------------
 FPS Credit:
 https://www.geeksforgeeks.org/python-displaying-real-time-fps-at-which-webcam-video-file-is-processed-using-opencv/
