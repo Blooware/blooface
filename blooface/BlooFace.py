@@ -1,7 +1,7 @@
 # This is the main file for Blooface.
 import os
 import random
-from keras.backend import log
+from deepface import DeepFace
 import pandas as pd
 from annoy import AnnoyIndex
 from deepface.commons import functions
@@ -9,12 +9,12 @@ from deepface.basemodels import Facenet
 
 
 class Blooface:
-    def __init__(self, database_path="database", file_type=".jpg", embedding_size=128, train=True):
+    def __init__(self, database_path="dataset/", file_type=".jpg", embedding_size=128, train=True):
         self.database_path = database_path
         self.file_type = file_type
         self.embedding_size = embedding_size
         self.model = Facenet.loadModel()
-        if train:
+        if (train):
             self.train()
 
     def train(self, synthesize=0):
@@ -27,7 +27,7 @@ class Blooface:
 
         representations = []
         for img_path in files:
-            img = functions.preprocess_face(img=img_path, target_size=(160, 160))
+            img = functions.preprocess_face(img=img_path, target_size=(160, 160), enforce_detection=False, detector_backend='mtcnn')
             embedding = self.model.predict(img)[0,:]
             
             representation = []
@@ -62,25 +62,22 @@ class Blooface:
         embeddings = pd.read_pickle("embeddings.pkl")
         t = AnnoyIndex(self.embedding_size, 'euclidean')
         t.load('result.ann')
-        print("Searching for %d similar images..." % (num_results))
         neighbors = t.get_nns_by_vector(embedding, num_results)
         img_paths = []
         for neighbor in neighbors:
-            print(embeddings.iloc[neighbor]["img_name"])
-            img_paths.append(embeddings.iloc[neighbors[neighbor]]["img_name"])
+            img_paths.append(embeddings.iloc[neighbor]["img_name"])
         
         return img_paths
 
     def query_image(self, img_path, num_results=2):
-        img = functions.preprocess_face(img=img_path, target_size=(160, 160))
+        img, region = functions.preprocess_face(img=img_path, target_size=(160, 160), enforce_detection=False, return_region=True, detector_backend='mtcnn')
         test_image = self.model.predict(img)[0,:]
-        return self.query_embedding(test_image, num_results)
+        return self.query_embedding(test_image, num_results), region
 
     def embedding(self, img_path):
         img = functions.preprocess_face(img=img_path, target_size=(160, 160))
         embedding = self.model.predict(img)[0,:]
         return embedding
 
-    def preprocess(self, img_path):
-        img = functions.preprocess_face(img=img_path, target_size=(160, 160))
-        return img
+    def detect(self, img_path):
+        return DeepFace.detectFace(img_path, detector_backend='mtcnn')
