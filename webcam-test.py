@@ -1,7 +1,7 @@
 import cv2
 import BlooFace
 
-blooFace = BlooFace.Blooface(train=False)
+blooFace = BlooFace.Blooface()
 
 # Get webcam feed
 cap = cv2.VideoCapture(0)
