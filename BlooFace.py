@@ -79,8 +79,8 @@ class Blooface:
         embedding = self.model.predict(img)[0,:]
         return embedding
 
-    def detect(self, img_path):
-        return DeepFace.detectFace(img_path, detector_backend='mtcnn')
+    def detect(self, frame, enforce=False, model='mtcnn'):
+        return functions.detect_face(frame, detector_backend=model, enforce_detection=enforce)
 
     def verify(self, img_1, img_2):
         return DeepFace.verify(img_1, img_2, distance_metric='euclidean', detector_backend='mtcnn')
